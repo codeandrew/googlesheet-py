@@ -28,5 +28,22 @@ def add_review():
     gsheet.insert_row(row, 2)  # since the first row is our title header
     return jsonify(gsheet.get_all_records())
 
+@app.route('/add_row', methods=["POST"])
+def add_row():
+    req = request.get_json()
+    print(req)
+    row = [
+        req["transaction_id"],
+        req["item_id"],
+        req["item_name"],
+        req["name"],
+        req["number"],
+        req["size"],
+        req["date"]
+         ]
+    gsheet.insert_row(row, 2)  # since the first row is our title header
+    return jsonify(gsheet.get_all_records())
+
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True, port=os.environ.get('PORT', 8080))
