@@ -28,6 +28,13 @@ def add_review():
     gsheet.insert_row(row, 2)  # since the first row is our title header
     return jsonify(gsheet.get_all_records())
 
+@app.route('/del_review/<email>', methods=["DELETE"])
+def del_review(email):
+    cells = gsheet.findall(str(email))
+    for c in cells:
+        gsheet.delete_row(c.row)
+    return jsonify(gsheet.get_all_records())
+
 @app.route('/add_row', methods=["POST"])
 def add_row():
     req = request.get_json()
