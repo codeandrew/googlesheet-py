@@ -5,8 +5,11 @@
 import os
 import gspread
 from flask import Flask, jsonify, request, abort
+from flask_cors import CORS
 from oauth2client.service_account import ServiceAccountCredentials
+
 app = Flask(__name__)
+CORS(app)
 
 # Google Sheets API Setup
 
