@@ -56,7 +56,8 @@ def add_row():
             ]
         gsheet.insert_row(row, 2)  # since the first row is our title header
 
-    return jsonify(gsheet.get_all_records())
+    return jsonify(gsheet.get_all_records()).headers.add("Access-Control-Allow-Origin", "*")
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True, port=os.environ.get('PORT', 8080))
