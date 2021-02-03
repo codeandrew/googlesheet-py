@@ -1,9 +1,10 @@
 #!/bin/bash
-set -x
 
 COUNTER=$1
 SUBPATH="add_row"
-URL="http://0.0.0.0:8080/${SUBPATH}"
+#DOMAIN=https://stimulusathletic-dwit4dasba-as.a.run.app
+DOMAIN=http://0.0.0.0:8080
+URL="${DOMAIN}/${SUBPATH}"
 #JSON='{"email":"example@email.com","date": "2021-01-01" ,"score":"$COUNTER" }'
 
 # JSON='{ "transaction_id" : 123123456456, "item_id": 123, "item_name": "Basic T-shirt", "name": "Billy Santors","number": 10,"size": "XXL", "date": "2021-01-01" }'
