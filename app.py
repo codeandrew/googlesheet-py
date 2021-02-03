@@ -5,11 +5,13 @@
 import os
 import gspread
 from flask import Flask, jsonify, request, abort
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from oauth2client.service_account import ServiceAccountCredentials
 
 app = Flask(__name__)
 CORS(app)
+app.config['CORS_HEADERS'] = 'application/json'
+
 
 # Google Sheets API Setup
 
@@ -30,7 +32,7 @@ def add_review():
     print(req)
     row = [req["email"], req["date"], req["score"]]
     gsheet.insert_row(row, 2)  # since the first row is our title header
-    return jsonify(gsheet.get_all_records())
+    return jsonify(gsheet.get_all_records()).headers.add("Access-Control-Allow-Origin", "*")
 
 @app.route('/del_review/<email>', methods=["DELETE"])
 def del_review(email):
@@ -40,6 +42,7 @@ def del_review(email):
     return jsonify(gsheet.get_all_records())
 
 @app.route('/add_row', methods=["POST"])
+@cross_origin()
 def add_row():
     postreq = request.get_json()
 
@@ -56,8 +59,7 @@ def add_row():
             ]
         gsheet.insert_row(row, 2)  # since the first row is our title header
 
-    return jsonify(gsheet.get_all_records()).headers.add("Access-Control-Allow-Origin", "*")
-
+    return jsonify(gsheet.get_all_records())
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True, port=os.environ.get('PORT', 8080))
