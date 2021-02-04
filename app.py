@@ -16,11 +16,13 @@ app.config['CORS_HEADERS'] = 'application/json'
 # Google Sheets API Setup
 
 credential = ServiceAccountCredentials.from_json_keyfile_name("credentials.json",
-                                                              ["https://spreadsheets.google.com/feeds",                                                               "https://www.googleapis.com/auth/spreadsheets",                                                        "https://www.googleapis.com/auth/drive.file",                                                        "https://www.googleapis.com/auth/drive"])
-client = gspread.authorize(credential)
-gsheet = client.open("Python Sheet").sheet1
-
-# An example GET Route to get all reviews
+                                                              ["https://spreadsheets.google.com/feeds", 
+                                                              "https://www.googleapis.com/auth/spreadsheets", 
+                                                              "https://www.googleapis.com/auth/drive.file",
+                                                              "https://www.googleapis.com/auth/drive"])
+                                                               
+client = gspread.authorize(credential) 
+gsheet = client.open("Python Sheet").sheet1 # An example GET Route to get all reviews
 @app.route('/all_reviews', methods=["GET"])
 def all_reviews():
     return jsonify(gsheet.get_all_records())
@@ -58,6 +60,36 @@ def add_row():
             req["date"]
             ]
         gsheet.insert_row(row, 2)  # since the first row is our title header
+
+    return jsonify(gsheet.get_all_records())
+
+@app.route('/create_sheet', methods=["POST"])
+@cross_origin()
+def create_sheet():
+    postreq = request.get_json()
+    spread_sheet_title = str(postreq[0].get("transaction_id"))
+
+    # spread_sheet_title = "TEST SPREAD"
+    folder_id = "19HaphKxEtDRmaJlAPRbf60l3jnu1zC1O"
+    spread_sheet = client.create(spread_sheet_title, folder_id)
+
+    app.logger.info(spread_sheet)
+
+    worksheet = spread_sheet.sheet1
+    head = ["transaction_id", "item_id", "item_name", "name", "number", "size", "date"]
+    worksheet.insert_row(head)
+
+    for req in postreq:
+        row = [
+            req["transaction_id"],
+            req["item_id"],
+            req["item_name"],
+            req["name"],
+            req["number"],
+            req["size"],
+            req["date"]
+        ]
+        worksheet.insert_row(row, 2)  # since the first row is our title header
 
     return jsonify(gsheet.get_all_records())
 
