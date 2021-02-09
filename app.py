@@ -4,6 +4,7 @@
 # Flask Setup
 import os
 import gspread
+from datetime import datetime
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS, cross_origin
 from oauth2client.service_account import ServiceAccountCredentials
@@ -73,6 +74,38 @@ def create_sheet():
     # folder_id = "19HaphKxEtDRmaJlAPRbf60l3jnu1zC1O" # Test Folder 
     folder_id = '1T9YCIWQck_CrBbnHPF2-83MNuqwlTkTF' # Shopify Order Folder
     # folder_id = '1kPejdi86OEi1jJ0Bm-9Eyl6ccvwKZb3o' # draft
+    spread_sheet = client.create(spread_sheet_title, folder_id)
+
+    app.logger.info(spread_sheet)
+
+    worksheet = spread_sheet.sheet1
+    head = ["transaction_id", "item_id", "item_name", "name", "number", "size", "date"]
+    worksheet.insert_row(head)
+
+    for req in postreq:
+        row = [
+            req["transaction_id"],
+            req["item_id"],
+            req["item_name"],
+            req["name"],
+            req["number"],
+            req["size"],
+            req["date"]
+        ]
+        worksheet.insert_row(row, 2)  # since the first row is our title header
+
+    return jsonify(worksheet.get_all_records())
+
+@app.route('/draft', methods=["POST"])
+@cross_origin()
+def create_draft_sheet():
+    postreq = request.get_json()
+    timestamp = datetime.today().strftime('%Y-%m-%d-%H:%M:%S')
+    spread_sheet_title = str(timestamp)
+
+    # folder_id = "19HaphKxEtDRmaJlAPRbf60l3jnu1zC1O" # Test Folder 
+    # folder_id = '1T9YCIWQck_CrBbnHPF2-83MNuqwlTkTF' # Shopify Order Folder
+    folder_id = '1kPejdi86OEi1jJ0Bm-9Eyl6ccvwKZb3o' # draft
     spread_sheet = client.create(spread_sheet_title, folder_id)
 
     app.logger.info(spread_sheet)
