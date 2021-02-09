@@ -22,7 +22,7 @@ credential = ServiceAccountCredentials.from_json_keyfile_name("credentials.json"
                                                               "https://www.googleapis.com/auth/drive"])
                                                                
 client = gspread.authorize(credential) 
-gsheet = client.open("Python Sheet").sheet1 # An example GET Route to get all reviews
+# gsheet = client.open("Python Sheet").sheet1 # An example GET Route to get all reviews
 @app.route('/all_reviews', methods=["GET"])
 def all_reviews():
     return jsonify(gsheet.get_all_records())
@@ -70,7 +70,9 @@ def create_sheet():
     spread_sheet_title = str(postreq[0].get("transaction_id"))
 
     # spread_sheet_title = "TEST SPREAD"
-    folder_id = "19HaphKxEtDRmaJlAPRbf60l3jnu1zC1O"
+    # folder_id = "19HaphKxEtDRmaJlAPRbf60l3jnu1zC1O" # Test Folder 
+    folder_id = '1T9YCIWQck_CrBbnHPF2-83MNuqwlTkTF' # Shopify Order Folder
+    # folder_id = '1kPejdi86OEi1jJ0Bm-9Eyl6ccvwKZb3o' # draft
     spread_sheet = client.create(spread_sheet_title, folder_id)
 
     app.logger.info(spread_sheet)
@@ -91,7 +93,7 @@ def create_sheet():
         ]
         worksheet.insert_row(row, 2)  # since the first row is our title header
 
-    return jsonify(gsheet.get_all_records())
+    return jsonify(worksheet.get_all_records())
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True, port=os.environ.get('PORT', 8080))
